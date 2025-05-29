@@ -1,4 +1,4 @@
-﻿using Producer;
+﻿using Producerr;
 using RabbitMQ.Client;
 using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.Reliable;
