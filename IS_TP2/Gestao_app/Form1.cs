@@ -85,5 +85,11 @@ namespace Gestao_app_
                 MessageBox.Show("Erro ao iniciar consumidor: " + ex.Message);
             }
         }
+
+        private void InitializeComponent()
+        {
+
+        }
     }
 }
+
