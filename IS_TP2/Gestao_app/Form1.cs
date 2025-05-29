@@ -7,7 +7,7 @@ using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.Reliable;
 using System.Buffers;
 
-namespace Gestao_app_
+namespace Gestao_app
 {
     public partial class Form1 : Form
     {
