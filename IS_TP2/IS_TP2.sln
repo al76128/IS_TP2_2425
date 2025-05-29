@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer", "Consumer\Consum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gestao_app", "Gestao_app\Gestao_app.csproj", "{B6BB94F8-4342-87A1-7472-E8E9D6F0868C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cliente_Soap", "Client_Soap\Cliente_Soap.csproj", "{75C69D94-5CCB-4036-8080-E1AE05C6C6BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_SOAP", "API_SOAP\API_SOAP.csproj", "{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{B6BB94F8-4342-87A1-7472-E8E9D6F0868C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6BB94F8-4342-87A1-7472-E8E9D6F0868C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6BB94F8-4342-87A1-7472-E8E9D6F0868C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75C69D94-5CCB-4036-8080-E1AE05C6C6BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75C69D94-5CCB-4036-8080-E1AE05C6C6BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75C69D94-5CCB-4036-8080-E1AE05C6C6BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75C69D94-5CCB-4036-8080-E1AE05C6C6BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

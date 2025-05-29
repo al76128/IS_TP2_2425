@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://tempuri.org/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="GetPecaMaiorPrejuizo">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetPecaMaiorPrejuizoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPecaMaiorPrejuizoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterCustosTotaisPorPeriodo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="inicio" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="fim" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterCustosTotaisPorPeriodoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ObterCustosTotaisPorPeriodoResult" type="s:decimal" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterLucroTotalPorPeriodo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="inicio" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="fim" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterLucroTotalPorPeriodoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ObterLucroTotalPorPeriodoResult" type="s:decimal" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterPrejuizoTotalPorPeca">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="inicio" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="fim" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterPrejuizoTotalPorPecaResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ObterPrejuizoTotalPorPecaResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ObterDadosFinanceirosPorPeca">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="codigoPeca" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObterDadosFinanceirosPorPecaResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ObterDadosFinanceirosPorPecaResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetPecaMaiorPrejuizoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPecaMaiorPrejuizo" />
+  </wsdl:message>
+  <wsdl:message name="GetPecaMaiorPrejuizoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPecaMaiorPrejuizoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObterCustosTotaisPorPeriodoSoapIn">
+    <wsdl:part name="parameters" element="tns:ObterCustosTotaisPorPeriodo" />
+  </wsdl:message>
+  <wsdl:message name="ObterCustosTotaisPorPeriodoSoapOut">
+    <wsdl:part name="parameters" element="tns:ObterCustosTotaisPorPeriodoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObterLucroTotalPorPeriodoSoapIn">
+    <wsdl:part name="parameters" element="tns:ObterLucroTotalPorPeriodo" />
+  </wsdl:message>
+  <wsdl:message name="ObterLucroTotalPorPeriodoSoapOut">
+    <wsdl:part name="parameters" element="tns:ObterLucroTotalPorPeriodoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObterPrejuizoTotalPorPecaSoapIn">
+    <wsdl:part name="parameters" element="tns:ObterPrejuizoTotalPorPeca" />
+  </wsdl:message>
+  <wsdl:message name="ObterPrejuizoTotalPorPecaSoapOut">
+    <wsdl:part name="parameters" element="tns:ObterPrejuizoTotalPorPecaResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObterDadosFinanceirosPorPecaSoapIn">
+    <wsdl:part name="parameters" element="tns:ObterDadosFinanceirosPorPeca" />
+  </wsdl:message>
+  <wsdl:message name="ObterDadosFinanceirosPorPecaSoapOut">
+    <wsdl:part name="parameters" element="tns:ObterDadosFinanceirosPorPecaResponse" />
+  </wsdl:message>
+  <wsdl:portType name="WebService1Soap">
+    <wsdl:operation name="GetPecaMaiorPrejuizo">
+      <wsdl:input message="tns:GetPecaMaiorPrejuizoSoapIn" />
+      <wsdl:output message="tns:GetPecaMaiorPrejuizoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObterCustosTotaisPorPeriodo">
+      <wsdl:input message="tns:ObterCustosTotaisPorPeriodoSoapIn" />
+      <wsdl:output message="tns:ObterCustosTotaisPorPeriodoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObterLucroTotalPorPeriodo">
+      <wsdl:input message="tns:ObterLucroTotalPorPeriodoSoapIn" />
+      <wsdl:output message="tns:ObterLucroTotalPorPeriodoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObterPrejuizoTotalPorPeca">
+      <wsdl:input message="tns:ObterPrejuizoTotalPorPecaSoapIn" />
+      <wsdl:output message="tns:ObterPrejuizoTotalPorPecaSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObterDadosFinanceirosPorPeca">
+      <wsdl:input message="tns:ObterDadosFinanceirosPorPecaSoapIn" />
+      <wsdl:output message="tns:ObterDadosFinanceirosPorPecaSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WebService1Soap" type="tns:WebService1Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetPecaMaiorPrejuizo">
+      <soap:operation soapAction="http://tempuri.org/GetPecaMaiorPrejuizo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterCustosTotaisPorPeriodo">
+      <soap:operation soapAction="http://tempuri.org/ObterCustosTotaisPorPeriodo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterLucroTotalPorPeriodo">
+      <soap:operation soapAction="http://tempuri.org/ObterLucroTotalPorPeriodo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterPrejuizoTotalPorPeca">
+      <soap:operation soapAction="http://tempuri.org/ObterPrejuizoTotalPorPeca" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterDadosFinanceirosPorPeca">
+      <soap:operation soapAction="http://tempuri.org/ObterDadosFinanceirosPorPeca" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WebService1Soap12" type="tns:WebService1Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetPecaMaiorPrejuizo">
+      <soap12:operation soapAction="http://tempuri.org/GetPecaMaiorPrejuizo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterCustosTotaisPorPeriodo">
+      <soap12:operation soapAction="http://tempuri.org/ObterCustosTotaisPorPeriodo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterLucroTotalPorPeriodo">
+      <soap12:operation soapAction="http://tempuri.org/ObterLucroTotalPorPeriodo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterPrejuizoTotalPorPeca">
+      <soap12:operation soapAction="http://tempuri.org/ObterPrejuizoTotalPorPeca" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObterDadosFinanceirosPorPeca">
+      <soap12:operation soapAction="http://tempuri.org/ObterDadosFinanceirosPorPeca" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WebService1">
+    <wsdl:port name="WebService1Soap" binding="tns:WebService1Soap">
+      <soap:address location="https://localhost:44326/WebService1.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WebService1Soap12" binding="tns:WebService1Soap12">
+      <soap12:address location="https://localhost:44326/WebService1.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
