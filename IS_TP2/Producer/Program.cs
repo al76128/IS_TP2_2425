@@ -1,12 +1,9 @@
-﻿
+﻿using Producer;
 using RabbitMQ.Client;
 using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.Reliable;
-using Producer;
-using System;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
