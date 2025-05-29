@@ -2,6 +2,7 @@
 using RabbitMQ.Client;
 using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.Reliable;
+using Producer;
 using System;
 using System.Text;
 using System.Text.Json;
