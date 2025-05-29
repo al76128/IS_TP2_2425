@@ -1,0 +1,1084 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RabbitMQ.Stream.Client</name>
+    </assembly>
+    <members>
+        <member name="P:RabbitMQ.Stream.Client.EntityCommonConfig.Identifier">
+            <summary>
+            The Identifier does not have any effect on the server.
+            It is used to identify the entity in the logs and on the UI (only for the consumer)
+            It is possible to retrieve the entity info using the Info.Identifier method form the
+            raw* instances.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.AbstractEntity.DeleteEntityFromTheServer(System.Boolean)">
+            <summary>
+            Remove the producer or consumer from the server
+            </summary>
+            <param name="ignoreIfAlreadyDeleted"> In case the producer or consumer is already removed from the server.
+            ex: metadata update </param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.AbstractEntity.Shutdown(RabbitMQ.Stream.Client.EntityCommonConfig,System.Boolean)">
+            <summary>
+            Internal close method. It is called by the public Close method.
+            Set the status to closed and remove the producer or consumer from the server ( if it is not already removed )
+            Close the TCP connection if it is not already closed or it is needed.
+            </summary>
+            <param name="config">The connection pool instance</param>
+            <param name="ignoreIfAlreadyDeleted"></param>
+            <returns></returns>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.AvailableFeatures">
+            <summary>
+            AvailableFeatures holds the features enabled by the server and the client.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ClientParameters.Ssl">
+            <summary>
+            TLS options setting.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.ClientExceptions.IsAKnownException(System.Exception)">
+             IsAKnownException returns true if the exception is a known exception
+             We need it to reconnect when the producer/consumer.
+             - LeaderNotFoundException is a temporary exception
+               It means that the leader is not available and the client can't reconnect.
+               Especially the Producer that needs to know the leader.
+             - SocketException
+               Client is trying to connect in a not ready endpoint.
+               It is usually a temporary situation.
+             -  TimeoutException
+                Network call timed out. It is often a temporary situation and we should retry.
+                In this case we can try to reconnect.
+            
+              For the other kind of exception, we just throw back the exception.
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.StreamCompressionCodecs">
+            <summary>
+            StreamCompressionCodecs: Global class to register/unregister the compress codec
+            GZip and None compression are provided by default
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.ConnectionClosePolicy.CloseWhenEmpty">
+            <summary>
+            The connection is closed when the last consumer or producer is removed.
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.ConnectionClosePolicy.CloseWhenEmptyAndIdle">
+            <summary>
+            The connection is closed when the last consumer or producer is removed and the connection is not used for a certain time.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionCloseConfig.Policy">
+            <summary>
+            Policy to close the connection.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionCloseConfig.IdleTime">
+            <summary>
+            The connection is closed when the last consumer or producer is removed and the connection is not used for a certain time.
+            Idle time is valid only if the policy is CloseWhenEmptyAndIdle.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionCloseConfig.CheckIdleTime">
+            <summary>
+            Interval to check the idle time.
+            Default is high because the check is done in a separate thread.
+            The filed is internal to help the test.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionPoolConfig.ConsumersPerConnection">
+            <summary>
+            A single TCP connection can handle multiple consumers.
+            From 1 to 255 consumers per connection.
+            The default value is 1. So one connection per consumer.
+            An high value can be useful to reduce the number of connections
+            but it is not the best for performance.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionPoolConfig.ProducersPerConnection">
+            <summary>
+            A single TCP connection can handle multiple producers.
+            From 1 to 255 consumers per connection.
+            The default value is 1. So one connection per producer.
+            An high value can be useful to reduce the number of connections
+            but it is not the best for performance.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionPoolConfig.ConnectionCloseConfig">
+            <summary>
+             Define the connection close policy.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.ConnectionsPool">
+            <summary>
+            ConnectionsPool is a pool of connections for producers and consumers.
+            Each connection can have multiple producers and consumers.
+            Each connection has only producers or consumers not both/mixed.
+            Each IClient has a client id that is a GUID that is the key of the pool.
+            We receive the broker info from the server, so we need to find if there is already a connection
+            with the same broker info and with free slots for producers or consumers.
+            The pool does not trace the producer/consumer ids but just the number of active items.
+            For example if a producer has the ids 2,3,4,6,8,10 the active items are 5.
+            The Tcp Client is responsible to trace the producer/consumer ids.
+            See Client properties:
+              subscriptionIds 
+              publisherIds  
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.ConnectionsPool.#ctor(System.Int32,System.Byte,RabbitMQ.Stream.Client.ConnectionCloseConfig)">
+            <summary>
+            Init the pool with the max connections and the max ids per connection
+            </summary>
+            <param name="maxConnections"> The max connections are allowed for session</param>
+            <param name="idsPerConnection"> The max ids per Connection</param>
+            <param name="connectionCloseConfig"> Policy to close the connections in the pool</param>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ConnectionsPool.Connections">
+            <summary>
+             Key: is the client id a GUID
+             Value is the connection item
+             The Connections contains all the connections created by the pool
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.ConnectionsPool.GetOrCreateClient(System.String,System.Func{System.Threading.Tasks.Task{RabbitMQ.Stream.Client.IClient}})">
+            <summary>
+            GetOrCreateClient returns a client for the given brokerInfo.
+            The broker info is the string representation of the broker ip and port.
+            See Metadata.cs Broker.ToString() method, ex: Broker(localhost,5552) is "localhost:5552" 
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.ConnectionsPool.RemoveConsumerEntityFromStream(System.String,System.Byte,System.String)">
+            <summary>
+            Removes the consumer entity from the client.
+            When the metadata update is called we need to remove the consumer entity from the client.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.ConnectionsPool.RemoveProducerEntityFromStream(System.String,System.Byte,System.String)">
+            <summary>
+            Removes the producer entity from the client.
+            When the metadata update is called we need to remove the consumer entity from the client.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.IClient">
+            <summary>
+            IClient is the Interface for the actual Client
+            It is needed to create unit tests hard to test using
+            Integration tests: See AddressResolver tests.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.ICrc32">
+            <summary>
+            ICrc32 defines an interface for implementing crc32 hashing.
+            Library users who wish to perform crc32 checks on data from RabbitMQ
+            should implement this interface and assign an instance to
+            <see cref="P:RabbitMQ.Stream.Client.IConsumerConfig.Crc32"><code>IConsumerConfig.Crc32</code></see>.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.IProducer.Send(System.UInt64,RabbitMQ.Stream.Client.Message)">
+            <summary>
+            Send the message to the stream in asynchronous mode.
+            The client will aggregate messages and send them in batches.
+            The batch size is configurable. See IProducerConfig.BatchSize.
+            </summary>
+            <param name="publishingId">Publishing id</param>
+            <param name="message"> Message </param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.IProducer.Send(System.Collections.Generic.List{System.ValueTuple{System.UInt64,RabbitMQ.Stream.Client.Message}})">
+            <summary>
+            Send the messages in batch to the stream in synchronous mode.
+            The aggregation is provided by the user.
+            The client will send the messages in the order they are provided.
+            </summary>
+            <param name="messages">Batch messages to send</param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.IProducer.Send(System.UInt64,System.Collections.Generic.List{RabbitMQ.Stream.Client.Message},RabbitMQ.Stream.Client.CompressionType)">
+            <summary>
+            Enable sub-batch feature.
+            It is needed when you need to sub aggregate the messages and compress them.
+            For example you can aggregate 100 log messages and compress to reduce the space.
+            One single publishingId can have multiple sub-batches messages.
+            See also: https://rabbitmq.github.io/rabbitmq-stream-java-client/stable/htmlsingle/#sub-entry-batching-and-compression
+            </summary>
+            <param name="publishingId"></param>
+            <param name="subEntryMessages">Messages to aggregate</param>
+            <param name="compressionType"> Type of compression. By default the client supports GZIP and none</param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.IProducer.GetLastPublishingId">
+            <summary>
+            Return the last publishing id.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.IProducer.Info">
+            <summary>
+            Info contains the reference and the stream name.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.ProducerFilter.FilterValue">
+            <summary>
+            FilterValue is a function that returns the filter value.
+            It is executed for each message.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.IProducerConfig.MessagesBufferSize">
+            <summary>
+            Number of the messages sent for each frame-send.
+            High values can increase the throughput.
+            Low values can reduce the messages latency.
+            Default value is 100.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.IProducerConfig.Filter">
+            <summary>
+            Filter enables the chunk filter feature.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.ProducerInfo">
+            <summary>
+            ProducerInfo contains the reference and the stream name.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.MessageContext">
+            <summary>
+            MessageContext contains message metadata information
+            
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.MessageContext.Offset">
+            <summary>
+            Message offset inside the log
+            each single message has its own offset
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.MessageContext.Timestamp">
+            <summary>
+            The timestamp of the message chunk.
+            A chunk (usually) contains multiple messages
+            The timestamp is the same for all messages in the chunk.
+            A chunk is simply a batch of messages. 
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.MessageContext.ChunkMessagesCount">
+            <summary>
+            The number of messages in the current chunk
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.MessageContext.ChunkId">
+            <summary>
+            It is the chunk id that can help to understand the ChuckMessagesCount
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawProducer.Send(System.UInt64,System.Collections.Generic.List{RabbitMQ.Stream.Client.Message},RabbitMQ.Stream.Client.CompressionType)">
+            <summary>
+            SubEntry Batch send: Aggregate more messages under the same publishingId.
+            Relation is publishingId ->[]messages. 
+            Messages can be compressed using different methods.
+            Note:
+            Deduplication is not guaranteed when using sub-entries batching.
+            </summary>
+            <param name="publishingId"></param>
+            <param name="subEntryMessages"> List of messages for sub-entry. Max len allowed is ushort.MaxValue</param>
+            <param name="compressionType">No Compression, Gzip Compression. Other types are not provided by default</param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawProducer.Send(System.Collections.Generic.List{System.ValueTuple{System.UInt64,RabbitMQ.Stream.Client.Message}})">
+            <summary>
+            Send messages in a synchronous way.
+            This method is needed to be used when you want to send messages in a synchronous way
+            to control the latency of the messages.
+            The Send(Message) method is asynchronous the aggregation of messages is done in the background.
+            </summary>
+            <param name="messages"></param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawProducer.GetLastPublishingId">
+            <summary>
+            GetLastPublishingId 
+            </summary>
+            <returns>The last sequence id stored by the producer.</returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawProducer.Send(System.UInt64,RabbitMQ.Stream.Client.Message)">
+            <summary>
+            This is the standard way to send messages.
+            The send is asynchronous and the aggregation of messages is done in the background.
+            This method can be used for the messages deduplication, if the publishingId is the same the broker will deduplicate the messages.
+            so only the fist message will be stored the second one will be discarded.
+            Read the documentation for more details.
+            <param name="publishingId">The Id for the message and has to be an incremental value.</param>>
+            <param name="message">Message to store</param>>
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawSuperStreamConsumer.Create(RabbitMQ.Stream.Client.RawSuperStreamConsumerConfig,System.Collections.Generic.IDictionary{System.String,RabbitMQ.Stream.Client.StreamInfo},RabbitMQ.Stream.Client.ClientParameters,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Create a new super stream consumer
+            </summary>
+            <param name="rawSuperStreamConsumerConfig"></param>
+            <param name="streamInfos"></param>
+            <param name="clientParameters"></param>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawSuperStreamConsumer.StoreOffset(System.UInt64)">
+            <summary>
+            It is not possible to close store the offset here since the consumer is not aware of the stream
+            you need to use the consumer inside the MessageHandler to store the offset
+            </summary>
+            <param name="offset"></param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.RawSuperStreamConsumerConfig.OffsetSpec">
+            <summary>
+            the offset spec for each stream
+            the user can specify the offset for each stream
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.RawSuperStreamConsumerConfig.MessageHandler">
+            <summary>
+            MessageHandler is called when a message is received
+            The first parameter is the stream name from which the message is coming from
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.RawSuperStreamProducer">
+             <summary>
+             RawSuperStreamProducer is a producer that can send messages to multiple streams.
+             Super Stream is available in RabbitMQ 3.11.0 and later.
+             See https://rabbitmq.com/streams.html#super-streams for more information.
+            
+             When a message is sent to a stream, the producer will be selected based on the stream name and the partition key.
+             SuperStreamProducer uses lazy initialization for the producers, when it starts there are no producers until the first message is sent.
+             </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RawSuperStreamProducer.GetLastPublishingId">
+            Returns lower from the LastPublishingId for all the producers
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.DefaultRoutingConfiguration">
+            <summary>
+             DefaultRoutingConfiguration is the default routing configuration
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.IRoutingStrategy">
+            <summary>
+            IRoutingStrategy the base interface for routing strategies
+            based on the message and the list of streams the traffic is routed to the stream
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.HashRoutingMurmurStrategy">
+            <summary>
+            HashRoutingMurmurStrategy is a routing strategy that uses the Murmur hash
+            function to route messages to streams.
+            See the HASH/Murmur32ManagedX86 implementation in the RabbitMQ .NET client.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.KeyRoutingStrategy">
+            <summary>
+            KeyRoutingStrategy is a routing strategy that uses the routing key to route messages to streams.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus">
+            <summary>
+            ConfirmationStatus can be:
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus.Confirmed">
+            <summary>
+            Message was confirmed to be received and stored by server.
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus.ClientTimeoutError">
+            <summary>
+            Client gave up on waiting for this publishing id.
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus.StreamNotAvailable">
+            <summary>
+            Stream is not available anymore (it was deleted).
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus.AccessRefused">
+            <summary>
+            Signals either bad credentials, or insufficient permissions.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.MessagesConfirmation">
+            <summary>
+            MessagesConfirmation is a wrapper around the message/s
+            This class is returned to the user to understand
+            the message status. 
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.ConfirmationPipe">
+            <summary>
+            ConfirmationPipe maintains the status for the sent and received messages.
+            TPL Action block sends the confirmation to the user in async way
+            So the send/1 is not blocking.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.Reference">
+            <summary>
+            Consumer reference name.
+            Used to identify the consumer server side when storing the messages offset.
+            <br/>
+            See also <see cref="M:RabbitMQ.Stream.Client.StreamSystem.QueryOffset(System.String,System.String)"/> to retrieve the last offset.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.ClientProvidedName">
+            <summary>
+            The client name used to identify the Consumer. 
+            You can see this value on the Management UI or in the connection details.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.MessageHandler">
+            <summary>
+            Callback function where the consumer receives the messages.
+            The callback runs in a different Task respect to the socket thread.
+            Parameters that will be received by this function:
+            <list type="bullet">
+            <item>
+            string: the stream name where the message was published
+            </item>
+            <item>
+            MessageContext: Context of the message, see <see cref="T:RabbitMQ.Stream.Client.MessageContext"/>
+            </item>
+            <item>
+            Message: the decode message received
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.IsSuperStream">
+            <summary>
+            Enable the SuperStream stream feature.
+            <br/>
+            <a href="https://blog.rabbitmq.com/posts/2022/07/rabbitmq-3-11-feature-preview-super-streams">
+            Check this link for more information about it.
+            </a>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.OffsetSpec">
+            <summary>
+            The offset is the place in the stream where the consumer starts consuming from.
+            The possible values are:
+            <list type="bullet">
+            <item>
+            <see cref="T:RabbitMQ.Stream.Client.OffsetTypeFirst"/>: starting from the first available offset.
+            If the stream has not been truncated, this means the beginning of the stream (offset 0).
+            </item>
+            <item>
+            <see cref="T:RabbitMQ.Stream.Client.OffsetTypeLast"/>: starting from the end of the stream
+            and returning the last chunk of messages immediately (if the stream is not empty).
+            </item>
+            <item>
+            <see cref="T:RabbitMQ.Stream.Client.OffsetTypeNext"/>: starting from the next offset to be written.
+            Contrary to OffsetTypeLast, consuming with OffsetTypeNext will not return anything if no-one is publishing to the stream.
+            The broker will start sending messages to the consumer when messages are published to the stream.
+            </item>
+            <item>
+            <see cref="T:RabbitMQ.Stream.Client.OffsetTypeOffset"/>(offset): starting from the specified offset.
+            0 means consuming from the beginning of the stream (first messages).
+            The client can also specify any number, for example the offset where it left off in a previous incarnation of the application.
+            </item>
+            <item>
+            <see cref="T:RabbitMQ.Stream.Client.OffsetTypeTimestamp"/>(timestamp): starting from the messages stored after the specified timestamp.
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.IsSingleActiveConsumer">
+            <summary>
+            When the single active consumer feature is enabled for several consumer instances sharing the same stream and name,
+            only one of these instances will be active at a time and will receive messages.
+            The other instances will be idle.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.ConsumerUpdateListener">
+            <summary>
+            The broker notifies a consumer that becomes active before dispatching messages to it. 
+            With ConsumerUpdateListener the consumer can decide where to start consuming from.
+            The event is raised only in case of single active consumer.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.Filter">
+            <summary>
+            Filter enable the consumer to receive only the messages that match the filter.
+            Filter.Values is the list of the values that the filter will match.
+            Filter.PostFilter is the function that will be executed after the filter.
+            The filter applied is a bloom filter, so there is a possibility of false positives.
+            The PostFilter helps to avoid false positives.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ConsumerConfig.Crc32">
+             <summary>
+             Enable the check of the crc on the delivery when set to an implementation
+             of <see cref="T:RabbitMQ.Stream.Client.ICrc32"><code>ICrc32</code></see>.
+             The server will send the crc for each chunk and the client will check it.
+             It is not enabled by default. In some case it is could reduce the performance.
+             ICrc32 is an interface that can be implemented by the user with the desired implementation.
+             The client is tested with the System.IO.Hashing.Crc32 implementation, like:
+            <c>
+             private class UserCrc32 : ICrc32 
+             {
+             public byte[] Hash(byte[] data)
+             {
+             return System.IO.Hashing.Crc32.Hash(data);
+             }
+             }
+             </c>
+             </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.Consumer">
+            <summary>
+            Consumer is a wrapper around the standard <see cref="T:RabbitMQ.Stream.Client.RawConsumer"/>.
+            Main features are:
+            <list type="bullet">
+            <item>
+            Auto-reconnection if the connection is dropped
+            </item>
+            <item>
+            Automatically restart consuming from the last offset 
+            </item>
+            <item>
+            Handle the Metadata Update. In case the stream is deleted Producer closes Producer/Connection.
+            </item>
+            <item>
+            Reconnect the Consumer if the stream still exists.
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.ConsumerFactory">
+            <summary>
+            ConsumerFactory is the class to decide which kind on the consumer is needed
+            Consumers are: Standard Consumer and Super Stream Consumer
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.IReconnectStrategy">
+            <summary>
+            IReconnectStrategy is the interface to reconnect the TCP client
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.IReconnectStrategy.WhenDisconnected(System.String)">
+            <summary>
+            WhenDisconnected is raised when the TPC client
+            is disconnected for some reason. 
+            </summary>
+            <param name="itemIdentifier">Additional connection info. Just for logging</param>
+            <returns>if True the client will be reconnected else closed</returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.IReconnectStrategy.WhenConnected(System.String)">
+            <summary>
+            It is raised when the TCP client is connected successfully 
+            </summary>
+            <param name="itemIdentifier">Additional info. Just for logging</param>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.BackOffReconnectStrategy">
+            <summary>
+            BackOffReconnectStrategy is the default IReconnectStrategy
+            implementation for Producer and Consumer
+            It implements a BackOff pattern.
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Stream.Client.Reliable.ProducerConfig._reference">
+            <summary>
+            Reference used for deduplication.
+            For the Producer Class, it is not needed to set this value
+            See DeduplicatingProducer for Deduplication Messages where this value is needed.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.ConfirmationHandler">
+            <summary>
+            Publish confirmation callback.<br/>
+            Used to inform publisher about success or failure of a publish.<br/>
+            Depending on publishing function used, either single message or whole batch can be in MessagesConfirmation.<br/>
+            For statuses that can be set on MessagesConfirmation, check <see cref="T:RabbitMQ.Stream.Client.Reliable.ConfirmationStatus"/>.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.ClientProvidedName">
+            <summary>
+            The client name used to identify the producer. 
+            You can see this value on the Management UI or in the connection details.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.Filter">
+            <summary>
+            Function used to set the value of the filter<br/>
+            The filter enable the server to filter the messages sent to the consumer.<br/>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.MessagesBufferSize">
+            <summary>
+            Number of the messages sent for each frame-send.<br/>
+            High values can increase the throughput.<br/>
+            Low values can reduce the messages latency.<br/>
+            Default value is 100.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.SuperStreamConfig">
+            <summary>
+            SuperStream configuration enables the SuperStream feature.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.TimeoutMessageAfter">
+            <summary>
+            TimeSpan after which Producer should give up on published message(s).
+            </summary>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException">Thrown if value is unreasonably low.</exception>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.Producer">
+            <summary>
+            Producer is a wrapper around the standard RawProducer/RawSuperStream Consumer.
+            Main features are:
+            <list type="bullet">
+            <item>
+            Auto-reconnection if the connection is dropped
+            </item>
+            <item>
+            Trace sent and received messages.
+            <see cref="P:RabbitMQ.Stream.Client.Reliable.ProducerConfig.ConfirmationHandler"/> will be invoked whenever message is (n)acked. 
+            </item>
+            <item>
+            Handle the Metadata Update.
+            In case the stream is deleted Producer closes Producer/Connection.
+            In case stream still exists, reconnect the producer.
+            </item>
+            Automatically set the next PublisherId.
+            <item>
+            </item>
+            <item>
+            Automatically retrieves the last sequence.
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.Producer.Create(RabbitMQ.Stream.Client.Reliable.ProducerConfig,Microsoft.Extensions.Logging.ILogger{RabbitMQ.Stream.Client.Reliable.Producer})">
+            <summary>
+            Create a new Producer.
+            <param name="producerConfig">Producer Configuration. Where StreamSystem and Stream are mandatory.</param>
+            <param name="logger">Enable the logging. By default is null. Add a logging is suggested</param>
+            </summary> 
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.Producer.Send(RabbitMQ.Stream.Client.Message)">
+            <summary>
+            This is the standard way to send messages.
+            The client aggregates the messages and sends them to the server in batches.
+            The publisherId is automatically set.
+            </summary>
+            <param name="message">Standard Message</param>
+            The method does not raise any exception during the send.
+            In case of error the message is considered as timed out, you will receive a confirmation with the status TimedOut.
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.Producer.Send(System.Collections.Generic.List{RabbitMQ.Stream.Client.Message},RabbitMQ.Stream.Client.CompressionType)">
+            <summary>
+            Enable sub-entry batch feature.
+            It is needed when you need to sub aggregate the messages and compress them.
+            For example you can aggregate 100 log messages and compress to reduce the space.
+            One single publishingId can have multiple sub-batches messages.
+            See also: https://rabbitmq.github.io/rabbitmq-stream-java-client/stable/htmlsingle/#sub-entry-batching-and-compression
+            </summary>
+            <param name="messages">Messages to aggregate</param>
+            <param name="compressionType"> Type of compression. By default the client supports GZIP and none</param>
+            <returns></returns>
+            The method does not raise any exception during the send.
+            In case of error the messages are considered as timed out, you will receive a confirmation with the status TimedOut.
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.Producer.Send(System.Collections.Generic.List{RabbitMQ.Stream.Client.Message})">
+            <summary>
+            Send the messages in batch to the stream in synchronous mode.
+            The aggregation is provided by the user.
+            The client will send the messages in the order they are provided.
+            </summary>
+            <param name="messages">Batch messages to send</param>
+            <returns></returns>
+            The method does not raise any exception during the send.
+            In case of error the messages are considered as timed out, you will receive a confirmation with the status TimedOut.
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.StatusInfo">
+            <summary>
+            StatusInfo is the information about the change status of the ReliableEntity
+            </summary>
+            <param name="From">The previous entity status </param>
+            <param name="To"> The new status </param>
+            <param name="Stream"> Stream or SuperSuper affected</param>
+            <param name="Identifier"> The Entity Identifier </param>
+            <param name="Partition"> [deprecated] Super stream partition. Valid only for SuperStream else is empty</param>
+            <param name="Partitions"> Super stream partitions. Valid only for SuperStream else is empty</param>
+             <param name="Reason"> The reason why the status changed </param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.StatusInfo.#ctor(RabbitMQ.Stream.Client.Reliable.ReliableEntityStatus,RabbitMQ.Stream.Client.Reliable.ReliableEntityStatus,System.String,System.String,System.String,System.Collections.Generic.List{System.String},RabbitMQ.Stream.Client.Reliable.ChangeStatusReason)">
+            <summary>
+            StatusInfo is the information about the change status of the ReliableEntity
+            </summary>
+            <param name="From">The previous entity status </param>
+            <param name="To"> The new status </param>
+            <param name="Stream"> Stream or SuperSuper affected</param>
+            <param name="Identifier"> The Entity Identifier </param>
+            <param name="Partition"> [deprecated] Super stream partition. Valid only for SuperStream else is empty</param>
+            <param name="Partitions"> Super stream partitions. Valid only for SuperStream else is empty</param>
+             <param name="Reason"> The reason why the status changed </param>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.From">
+            <summary>The previous entity status </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.To">
+            <summary> The new status </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.Stream">
+            <summary> Stream or SuperSuper affected</summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.Identifier">
+            <summary> The Entity Identifier </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.Partition">
+            <summary> [deprecated] Super stream partition. Valid only for SuperStream else is empty</summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.Partitions">
+            <summary> Super stream partitions. Valid only for SuperStream else is empty</summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.StatusInfo.Reason">
+             <summary> The reason why the status changed </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ReliableConfig.ReconnectStrategy">
+            <summary>
+            The interface to reconnect the entity to the server.
+            By default it uses a BackOff pattern. See <see cref="T:RabbitMQ.Stream.Client.Reliable.BackOffReconnectStrategy"/>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ReliableConfig.ResourceAvailableReconnectStrategy">
+            <summary>
+            The interface to check if the resource is available.
+            A stream could be not fully ready during the restarting.
+            By default it uses a BackOff pattern. See <see cref="T:RabbitMQ.Stream.Client.Reliable.ResourceAvailableBackOffReconnectStrategy"/>
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.Reliable.ReliableConfig.Identifier">
+            <summary>
+            The Identifier does not have any effect on the server.
+            It is used to identify the entity in the logs and on the UI (only for the consumer)
+            It is possible to retrieve the entity info using the Info.Identifier method form the
+            Producer/Consumer instances.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.ReliableEntityStatus">
+            <summary>
+            The ReliableEntityStatus is used to check the status of the ReliableEntity.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.Reliable.ReliableBase">
+            <summary>
+            Base class for Reliable producer/ consumer
+            With the term Entity we mean a Producer or a Consumer
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.FromConnectionClosedReasonToStatusReason(System.String)">
+            <summary>
+            The function to convert the string ConnectionClosedReason to the ChangeStatusReason enum
+            
+            </summary>
+            <param name="connectionClosedReason"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.Init(System.Boolean)">
+            Init the reliable client
+            <param name="boot"> If it is the First boot for the reliable P/C </param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.CreateNewEntity(System.Boolean)">
+            <summary>
+            Init the a new Entity (Producer/Consumer)
+            <param name="boot"> If it is the First boot for the reliable P/C </param>
+            Called by Init method
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.CheckIfStreamIsAvailable(System.String,RabbitMQ.Stream.Client.StreamSystem)">
+            <summary>
+            When the clients receives a meta data update, it doesn't know
+            If the stream exists or not. It just knows that the stream topology has changed.
+            the method CheckIfStreamIsAvailable checks if the stream exists
+            and if the leader is available.
+            </summary>
+            <param name="stream">stream name</param>
+            <param name="system">stream system</param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.MaybeReconnect">
+            Try to reconnect to the broker
+            Based on the retry strategy
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.CloseEntity">
+            <summary>
+            ONLY close the current Entity (Producer/Consumer)
+            without closing the Reliable(Producer/Consumer) instance.
+            It happens when the stream change topology, and the entity 
+            must be recreated. In the producer case for example when the
+            leader changes.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.OnEntityClosed(RabbitMQ.Stream.Client.StreamSystem,System.String,System.Func{RabbitMQ.Stream.Client.StreamInfo,System.Threading.Tasks.Task},RabbitMQ.Stream.Client.Reliable.ChangeStatusReason)">
+            <summary>
+            Handle the partition reconnection in case of super stream entity
+            </summary>
+            <param name="system">Stream System</param>
+            <param name="stream">Partition Stream</param>
+            <param name="reconnectPartitionFunc">Function to reconnect the partition</param>
+            <param name="reason">The reason why the connection is closed (Metadata update od disconnection)</param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.OnEntityClosed(RabbitMQ.Stream.Client.StreamSystem,System.String,RabbitMQ.Stream.Client.Reliable.ChangeStatusReason)">
+            <summary>
+            Handle the regular stream reconnection 
+            </summary>
+            <param name="system">Stream system</param>
+            <param name="stream">Stream</param>
+            <param name="reason">The reason why the connection is closed (Metadata update od disconnection)</param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.Reliable.ReliableBase.Close">
+            Close the Reliable(Producer/Consumer) instance.
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.RoutingHelper`1">
+            <summary>
+            Routes the client connection to the correct node.
+            It lookups the leader node for a producer. If case AddressResolver is enabled it tries
+            until the connection properties Host/Port and  advertisedHost and advertisedPort match.
+            It lookups a random node (from leader and replicas) for a consumer.
+            
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RoutingHelper`1.LookupLeaderConnection(RabbitMQ.Stream.Client.ClientParameters,RabbitMQ.Stream.Client.StreamInfo,RabbitMQ.Stream.Client.ConnectionsPool,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Gets the leader connection. The producer must connect to the leader. 
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.RoutingHelper`1.LookupLeaderOrRandomReplicasConnection(RabbitMQ.Stream.Client.ClientParameters,RabbitMQ.Stream.Client.StreamInfo,RabbitMQ.Stream.Client.ConnectionsPool,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Gets a random connection a random replica.
+            If the replicas are not available it will connect to the leader.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.SslHelper">
+            <summary>
+            Represents an <see cref="T:RabbitMQ.Stream.Client.SslHelper"/> which does the actual heavy lifting to set up an SSL connection,
+             using the config options in an <see cref="T:RabbitMQ.Stream.Client.SslOption"/> to make things cleaner.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.SslHelper.TcpUpgrade(System.IO.Stream,RabbitMQ.Stream.Client.SslOption)">
+            <summary>
+            Upgrade a Tcp stream to an Ssl stream using the TLS options provided.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.SslOption">
+            <summary>
+            Represents a set of configurable TLS options for a connection. Use this class to configure
+            TLS version used, client certificate list or file location, peer certificate verification
+            (validation) functions, expected server name (Subject Alternative Name or Common Name),
+            and so on.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.SslOption.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:RabbitMQ.Stream.Client.SslOption"/> specifying both the server canonical name and the client's certificate path.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.SslOption.#ctor">
+            <summary>
+            Constructs an <see cref="T:RabbitMQ.Stream.Client.SslOption"/> with no parameters set.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.AcceptablePolicyErrors">
+            <summary>
+            Retrieve or set the set of TLS policy (peer verification) errors that are deemed acceptable.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.CertPassphrase">
+            <summary>
+            Retrieve or set the client certificate passphrase.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.CertPath">
+            <summary>
+            Retrieve or set the path to client certificate.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.CertificateSelectionCallback">
+            <summary>
+            An optional client TLS certificate selection callback. If this is not specified,
+            the first valid certificate found will be used.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.CertificateValidationCallback">
+            <summary>
+            An optional peer verification (TLS certificate validation) callback. If this is not specified,
+            the default callback will be used in conjunction with the <see cref="P:RabbitMQ.Stream.Client.SslOption.AcceptablePolicyErrors"/> property to
+            determine if the peer's (server's) certificate should be considered valid (acceptable).
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.Certs">
+            <summary>
+            Retrieve or set the X509CertificateCollection containing the client certificate.
+            If no collection is set, the client will attempt to load one from the specified <see cref="P:RabbitMQ.Stream.Client.SslOption.CertPath"/>.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.CheckCertificateRevocation">
+            <summary>
+            Attempts to check certificate revocation status. Default is false.
+            Set to true to check peer certificate for revocation.
+            </summary>
+            <remarks>
+            Uses the built-in .NET TLS implementation machinery for checking a certificate against
+            certificate revocation lists.
+            </remarks>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.Enabled">
+            <summary>
+            Controls if TLS should indeed be used. Set to false to disable TLS
+            on the connection.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.ServerName">
+            <summary>
+            Retrieve or set server's expected name.
+            This MUST match the Subject Alternative Name (SAN) or CN on the peer's (server's) leaf certificate,
+            otherwise the TLS connection will fail.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SslOption.Version">
+            <summary>
+            Retrieve or set the TLS protocol version.
+            The client will let the OS pick a suitable version by using <see cref="F:System.Security.Authentication.SslProtocols.None" />.
+            If this option is disabled, e.g.see via app context, the client will attempt to fall back
+            to TLSv1.2.
+            </summary>
+            <seealso cref="T:System.Security.Authentication.SslProtocols" />
+            <seealso href="https://www.rabbitmq.com/ssl.html#dotnet-client" />
+            <seealso href="https://docs.microsoft.com/en-us/dotnet/framework/network-programming/tls?view=netframework-4.6.2" />
+            <seealso href="https://docs.microsoft.com/en-us/dotnet/api/system.security.authentication.sslprotocols?view=netframework-4.8" />
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.SslOption.UseFallbackTlsVersions">
+            <summary>
+            Reconfigures the instance to enable/use TLSv1.2.
+            Only used in environments where System.Security.Authentication.SslProtocols.None
+            is unavailable or effectively disabled, as reported by System.Net.ServicePointManager.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.SuperStreamSpec">
+            <summary>
+            Abstract class for SuperStreamSpec
+            </summary>
+            <param name="Name"> Super Stream Name</param>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.SuperStreamSpec.#ctor(System.String)">
+            <summary>
+            Abstract class for SuperStreamSpec
+            </summary>
+            <param name="Name"> Super Stream Name</param>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.SuperStreamSpec.Name">
+            <summary> Super Stream Name</summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.PartitionsSuperStreamSpec">
+            <summary>
+            Create a super stream based on the number of partitions.
+            So there will be N partitions and N binding keys.
+            The stream names is the super stream name with a partition number appended.
+            The routing key is the partition number.
+            Producer should use HASH strategy to route the message to the correct partition.
+            Partitions should be at least 1.
+            </summary>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.BindingsSuperStreamSpec">
+            <summary>
+            Create a super stream based on the number of binding keys.
+            So there will be N partitions and N binding keys.
+            The stream names is the super stream name with a binding key appended.
+            Producer should use KEY strategy to route the message to the correct partition.
+            The binding keys should be unique duplicates are not allowed.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamStats.FirstOffset">
+             <summary>
+             The first offset in the stream.
+            
+             return first offset in the stream
+             throws NoOffsetException if there is no first offset yet
+             </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamStats.CommittedChunkId">
+             <summary>
+             The ID (offset) of the committed chunk (block of messages) in the stream.
+            
+             It is the offset of the first message in the last chunk confirmed by a quorum of the stream
+             cluster members (leader and replicas).
+            
+             The committed chunk ID is a good indication of what the last offset of a stream can be at a
+             given time. The value can be stale as soon as the application reads it though, as the committed
+             chunk ID for a stream that is published to changes all the time.
+            
+             return committed offset in this stream
+             throws NoOffsetException if there is no committed chunk yet
+            
+             </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.StreamSystemConfig.Ssl">
+            <summary>
+            TLS options setting.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.StreamSystemConfig.ConnectionPoolConfig">
+            <summary>
+             Configure the connection pool for producers and consumers.
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Stream.Client.StreamSystemConfig.RpcTimeOut">
+            <summary>
+             The timeout for RPC calls, like PeerProperties, QueryMetadata, etc.
+            Default value is 10 seconds and in most cases it should be enough.
+            Low value can cause false errors in the client.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamSystem.QueryPartition(System.String)">
+            <summary>
+            Returns the list of partitions for a given super stream
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamSystem.QueryOffset(System.String,System.String)">
+            <summary>
+            QueryOffset retrieves the last consumer offset stored
+            given a consumer name and stream name 
+            </summary>
+            <param name="reference">Consumer name</param>
+            <param name="stream">Stream name</param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamSystem.TryQueryOffset(System.String,System.String)">
+            <summary>
+            TryQueryOffset tries to retrieve the last consumer offset stored
+            given a consumer name and stream name.
+            Returns null if the offset is not found.
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.StreamSystem.QuerySequence(System.String,System.String)">
+            <summary>
+            QuerySequence retrieves the last publishing ID
+            given a producer name and stream 
+            </summary>
+            <param name="reference">Producer name</param>
+            <param name="stream">Stream name</param>
+            <returns></returns>
+        </member>
+        <member name="T:RabbitMQ.Stream.Client.OffsetTypeTimestamp">
+            <summary>
+            Offset of type timestamp.
+            </summary>
+            <remarks>Note that timestamp itself is not UNIX timestamp but millisecond-precise UNIX timestamp.</remarks>
+        </member>
+        <member name="M:RabbitMQ.Stream.Client.OffsetTypeTimestamp.#ctor(System.Int64)">
+            <summary>
+            Create offset of type timestamp from given timestamp.
+            </summary>
+            <param name="timestamp">unix timestamp, millisecond precision</param>
+            <remarks>Note that timestamp itself is not UNIX timestamp but millisecond-precise UNIX timestamp.</remarks>
+        </member>
+    </members>
+</doc>
