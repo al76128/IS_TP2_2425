@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "7DKKLBWzapg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\anton\\source\\repos\\Gestao_app_\\Gestao_app_.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\anton\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\rabbitmq.client\\7.1.2\\rabbitmq.client.7.1.2.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\rabbitmq.stream.client\\1.8.13\\rabbitmq.stream.client.1.8.13.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
+    "C:\\Users\\anton\\.nuget\\packages\\system.threading.ratelimiting\\8.0.0\\system.threading.ratelimiting.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
