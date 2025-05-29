@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer", "Consumer\Consum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gestao_app", "Gestao_app\Gestao_app.csproj", "{B6BB94F8-4342-87A1-7472-E8E9D6F0868C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cliente_SOAP", "..\..\..\..\Desktop\Cliente_SOAP\Cliente_SOAP.csproj", "{885A5135-0D36-41D5-B1B3-8BE49F608CCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cliente_SOAP", "Cliente_SOAP\Cliente_SOAP.csproj", "{885A5135-0D36-41D5-B1B3-8BE49F608CCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
