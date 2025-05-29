@@ -27,7 +27,7 @@ namespace Producerr
             TimeSpan horaProducao = DateTime.Now.TimeOfDay;
             int tempoProducao = random.Next(10, 51);
 
-            // ✅ Usa distribuição realista para o resultado do teste
+            // Usa distribuição realista para o resultado do teste
             string codigoResultado = GerarCodigoResultado();
 
             return new Produto
@@ -40,7 +40,7 @@ namespace Producerr
             };
         }
 
-        // ✅ Método ativo para gerar resultado com distribuição realista
+        // Método ativo para gerar resultado com distribuição realista
         private static string GerarCodigoResultado()
         {
             int chance = random.Next(100); // Número entre 0 e 99

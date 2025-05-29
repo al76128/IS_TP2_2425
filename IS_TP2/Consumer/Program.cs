@@ -44,7 +44,7 @@ consumer.ReceivedAsync += async (model, ea) =>
 
         if (resultado != "01")
         {
-            Console.WriteLine("⚠️ PEÇA COM FALHA:");
+            Console.WriteLine("!!! PEÇA COM FALHA:");
             Console.WriteLine($"→ Código: {codigo}");
             Console.WriteLine($"→ Tempo: {tempo} segundos");
             Console.WriteLine($"→ Resultado: {resultado}");
@@ -87,10 +87,10 @@ static async Task EnviarParaApiAsync(string codigoPeca, DateTime data, TimeSpan 
 
         response.EnsureSuccessStatusCode();
 
-        Console.WriteLine("✅ Produto enviado para a API com sucesso.");
+        Console.WriteLine("+++ Produto enviado para a API com sucesso.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("❌ Erro ao enviar para API: " + ex.Message);
+        Console.WriteLine("--- Erro ao enviar para API: " + ex.Message);
     }
 }

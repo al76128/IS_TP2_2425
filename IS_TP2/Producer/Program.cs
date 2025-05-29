@@ -11,7 +11,7 @@ using var channel = await connection.CreateChannelAsync();
 
 await channel.ExchangeDeclareAsync(exchange: "producao_exchange", type: ExchangeType.Topic);
 
-// 🔄 Stream setup
+// Stream setup
 var streamName = "producao_stream";
 
 var streamSystem = await StreamSystem.Create(new StreamSystemConfig());
@@ -50,11 +50,11 @@ while (true)
     string json = JsonSerializer.Serialize(mensagem);
     var body = Encoding.UTF8.GetBytes(json);
 
-    // ✅ Envia para topic exchange
+    // Envia para topic exchange
     await channel.BasicPublishAsync(exchange: "producao_exchange", routingKey: routingKey, body: body);
     Console.WriteLine($"📤 Topic Exchange → '{routingKey}': {json}");
 
-    // ✅ Envia para stream
+    // Envia para stream
     await streamProducer.Send(new Message(body));
     Console.WriteLine($"📤 Stream → {json}");
 
