@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client_Soap", "Client_Soap\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_SOAP", "API_SOAP\API_SOAP.csproj", "{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProducaoAPI", "ProducaoAPI\ProducaoAPI.csproj", "{12F4A10C-369F-1DCC-2506-522160D22B7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05057C56-8F2C-44A2-B14E-E9D9DEC8F89C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12F4A10C-369F-1DCC-2506-522160D22B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12F4A10C-369F-1DCC-2506-522160D22B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12F4A10C-369F-1DCC-2506-522160D22B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12F4A10C-369F-1DCC-2506-522160D22B7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

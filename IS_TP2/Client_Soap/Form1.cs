@@ -42,5 +42,15 @@ namespace Cliente_Soap
             var dados = client.ObterDadosFinanceirosPorPeca(codigo);
             txtResultado.Text = dados.Replace("€", "EUR ");
         }
+
+
+        /// <summary>
+        
+        /// </summary>
+        private void btnpreju_Click(object sender, EventArgs e)
+        {
+            var cod = client.GetPecaMaiorPrejuizo();
+            txtResultado.Text = $"Peca com maior prejuizo de sempre: {cod}";
+        }
     }
 }

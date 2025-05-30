@@ -25,27 +25,28 @@
             this.btnLucro = new System.Windows.Forms.Button();
             this.btnPrejuizo = new System.Windows.Forms.Button();
             this.btnPeca = new System.Windows.Forms.Button();
+            this.btnpreju = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // dateInicio
             // 
             this.dateInicio.Location = new System.Drawing.Point(12, 12);
             this.dateInicio.Name = "dateInicio";
-            this.dateInicio.Size = new System.Drawing.Size(200, 22);
+            this.dateInicio.Size = new System.Drawing.Size(200, 26);
             this.dateInicio.TabIndex = 0;
             // 
             // dateFim
             // 
             this.dateFim.Location = new System.Drawing.Point(228, 12);
             this.dateFim.Name = "dateFim";
-            this.dateFim.Size = new System.Drawing.Size(200, 22);
+            this.dateFim.Size = new System.Drawing.Size(200, 26);
             this.dateFim.TabIndex = 1;
             // 
             // txtCodigo
             // 
             this.txtCodigo.Location = new System.Drawing.Point(12, 48);
             this.txtCodigo.Name = "txtCodigo";
-            this.txtCodigo.Size = new System.Drawing.Size(416, 22);
+            this.txtCodigo.Size = new System.Drawing.Size(416, 26);
             this.txtCodigo.TabIndex = 2;
             // 
             // txtResultado
@@ -97,9 +98,20 @@
             this.btnPeca.UseVisualStyleBackColor = true;
             this.btnPeca.Click += new System.EventHandler(this.btnPeca_Click);
             // 
+            // btnpreju
+            // 
+            this.btnpreju.Location = new System.Drawing.Point(95, 112);
+            this.btnpreju.Name = "btnpreju";
+            this.btnpreju.Size = new System.Drawing.Size(243, 22);
+            this.btnpreju.TabIndex = 7;
+            this.btnpreju.Text = "Peça com maior prejuizo";
+            this.btnpreju.UseVisualStyleBackColor = true;
+            this.btnpreju.Click += new System.EventHandler(this.btnpreju_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(437, 361);
+            this.Controls.Add(this.btnpreju);
             this.Controls.Add(this.btnPeca);
             this.Controls.Add(this.btnPrejuizo);
             this.Controls.Add(this.btnLucro);
@@ -125,5 +137,6 @@
         private System.Windows.Forms.Button btnLucro;
         private System.Windows.Forms.Button btnPrejuizo;
         private System.Windows.Forms.Button btnPeca;
+        private System.Windows.Forms.Button btnpreju;
     }
 }
