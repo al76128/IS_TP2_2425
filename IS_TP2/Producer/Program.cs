@@ -22,11 +22,11 @@ if (!await streamSystem.StreamExists(streamName))
     {
         MaxLengthBytes = 5_000_000_000
     });
-    Console.WriteLine($"✅ Stream '{streamName}' criado.");
+    Console.WriteLine($"+++ Stream '{streamName}' criado.");
 }
 else
 {
-    Console.WriteLine($"ℹ️ Stream '{streamName}' já existe.");
+    Console.WriteLine($"info Stream '{streamName}' já existe.");
 }
 
 var streamProducer = await Producer.Create(new ProducerConfig(streamSystem, streamName));
@@ -52,11 +52,11 @@ while (true)
 
     // Envia para topic exchange
     await channel.BasicPublishAsync(exchange: "producao_exchange", routingKey: routingKey, body: body);
-    Console.WriteLine($"📤 Topic Exchange → '{routingKey}': {json}");
+    Console.WriteLine($" Topic Exchange → '{routingKey}': {json}");
 
     // Envia para stream
     await streamProducer.Send(new Message(body));
-    Console.WriteLine($"📤 Stream → {json}");
+    Console.WriteLine($" Stream → {json}");
 
     await Task.Delay(5000);
 }

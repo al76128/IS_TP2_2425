@@ -71,7 +71,7 @@
             Controls.Add(labelFalha);
             Controls.Add(labelMediaTempo);
             Name = "Form1";
-            Text = "📊 Dashboard de Gestão";
+            Text = "Dashboard de Gestão";
             ResumeLayout(false);
             PerformLayout();
 
