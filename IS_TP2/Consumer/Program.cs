@@ -70,10 +70,13 @@ static async Task EnviarParaApiAsync(string codigoPeca, DateTime data, TimeSpan 
 {
     var produto = new
     {
-        Codigo_Peca = codigoPeca,
-        Data_Producao = data.ToString("yyyy-MM-dd"),
-        Hora_Producao = hora.ToString(@"hh\:mm\:ss"),
-        Tempo_Producao = tempo
+        Produto = new
+        {
+            Codigo_Peca = codigoPeca,
+            Data_Producao = data.ToString("yyyy-MM-dd"),
+            Hora_Producao = hora.ToString(@"hh\:mm\:ss"),
+            Tempo_Producao = tempo
+        }
     };
 
     using var client = new HttpClient();
@@ -81,7 +84,7 @@ static async Task EnviarParaApiAsync(string codigoPeca, DateTime data, TimeSpan 
     try
     {
         var response = await client.PostAsync(
-            "http://localhost:5077/api/produto",
+            "http://localhost:5077/api/Produto",
             new StringContent(JsonSerializer.Serialize(produto), Encoding.UTF8, "application/json")
         );
 
