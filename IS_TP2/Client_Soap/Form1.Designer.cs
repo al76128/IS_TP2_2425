@@ -48,13 +48,15 @@
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(416, 26);
             this.txtCodigo.TabIndex = 2;
+            this.txtCodigo.Enter += new System.EventHandler(this.txtCodigo_Enter);
+            this.txtCodigo.Leave += new System.EventHandler(this.txtCodigo_Leave);
             // 
             // txtResultado
             // 
             this.txtResultado.Location = new System.Drawing.Point(12, 140);
             this.txtResultado.Multiline = true;
             this.txtResultado.Name = "txtResultado";
-            this.txtResultado.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtResultado.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtResultado.Size = new System.Drawing.Size(416, 200);
             this.txtResultado.TabIndex = 6;
             // 
@@ -104,7 +106,7 @@
             this.btnpreju.Name = "btnpreju";
             this.btnpreju.Size = new System.Drawing.Size(243, 22);
             this.btnpreju.TabIndex = 7;
-            this.btnpreju.Text = "Peça com maior prejuizo";
+            this.btnpreju.Text = "Peça/s com maior prejuizo";
             this.btnpreju.UseVisualStyleBackColor = true;
             this.btnpreju.Click += new System.EventHandler(this.btnpreju_Click);
             // 

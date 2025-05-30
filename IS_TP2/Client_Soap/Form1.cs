@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Cliente_Soap.ServiceReference1;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
-using Cliente_Soap.ServiceReference1;
 
 namespace Cliente_Soap
 {
@@ -12,7 +13,37 @@ namespace Cliente_Soap
         public Form1()
         {
             InitializeComponent();
+            this.Load += new System.EventHandler(this.Form1_Load);
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            txtCodigo.Text = "Insira o código da peça...";
+            txtCodigo.ForeColor = Color.Gray;
+        }
+
+
+        //Eventos
+        private void txtCodigo_Enter(object sender, EventArgs e)
+        {
+            if (txtCodigo.Text == "Insira o código da peça...")
+            {
+                txtCodigo.Text = "";
+                txtCodigo.ForeColor = Color.Black;
+            }
+        }
+
+        private void txtCodigo_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                txtCodigo.Text = "Insira o código da peça...";
+                txtCodigo.ForeColor = Color.Gray;
+            }
+        }
+
+
+        //-------------------------------------------
 
         private void btnCusto_Click(object sender, EventArgs e)
         {
@@ -40,17 +71,18 @@ namespace Cliente_Soap
         {
             var codigo = txtCodigo.Text;
             var dados = client.ObterDadosFinanceirosPorPeca(codigo);
-            txtResultado.Text = dados.Replace("€", "EUR ");
+
+            //txtResultado.Text = dados.Replace("€", "EUR ");
+            txtResultado.Text = dados.Replace("|", Environment.NewLine);
         }
 
-
-        /// <summary>
-        
-        /// </summary>
         private void btnpreju_Click(object sender, EventArgs e)
         {
             var cod = client.GetPecaMaiorPrejuizo();
-            txtResultado.Text = $"Peca com maior prejuizo de sempre: {cod}";
+
+            //txtResultado.Text = $"Peça/s com maior prejuizo de sempre: \n{cod}";
+            txtResultado.Text = cod.Replace("|", Environment.NewLine);
         }
+
     }
 }

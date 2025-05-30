@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Services;
 
@@ -16,14 +17,26 @@ namespace API_SOAP
         [WebMethod]
         public string GetPecaMaiorPrejuizo()
         {
-            string query = @"SELECT TOP 1 Codigo_Peca FROM Custos_Peca ORDER BY Prejuizo DESC";
+            string query = @"SELECT Codigo_Peca, Prejuizo 
+                     FROM Custos_Peca 
+                     WHERE Prejuizo = (SELECT MAX(Prejuizo) FROM Custos_Peca)";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 conn.Open();
-                var result = cmd.ExecuteScalar();
-                return result?.ToString() ?? "Nenhuma peça encontrada.";
+                var reader = cmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                    return "Nenhuma peça encontrada.";
+
+                StringBuilder sb = new StringBuilder();
+                while (reader.Read())
+                {
+                    sb.AppendLine($"Peça: {reader["Codigo_Peca"]} -> Prejuízo: €{reader["Prejuizo"]}|");
+                }
+
+                return sb.ToString();
             }
         }
 
@@ -94,7 +107,7 @@ namespace API_SOAP
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    string linha = $"Peça {reader.GetString(0)}: €{reader.GetDecimal(1)}";
+                    string linha = $"Peça: {reader.GetString(0)} -> Prejuízo: €{reader.GetDecimal(1)}";
                     resultado.Add(linha);
                 }
             }
@@ -116,7 +129,7 @@ namespace API_SOAP
                 var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return $"Peça: {reader["Codigo_Peca"]}, Tempo: {reader["Tempo_Producao"]}s, Custo: €{reader["Custo_Producao"]}, Prejuízo: €{reader["Prejuizo"]}, Lucro: €{reader["Lucro"]}";
+                    return $"Peça: {reader["Codigo_Peca"]}|Tempo: {reader["Tempo_Producao"]}s|Custo: EUR {reader["Custo_Producao"]}|Prejuízo: EUR {reader["Prejuizo"]}|Lucro: EUR {reader["Lucro"]}";
                 }
             }
 
