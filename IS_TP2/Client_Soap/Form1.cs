@@ -9,21 +9,22 @@ namespace Cliente_Soap
     public partial class Form1 : Form
     {
         WebService1SoapClient client = new WebService1SoapClient();
-
+ 
         public Form1()
         {
             InitializeComponent();
             this.Load += new System.EventHandler(this.Form1_Load);
         }
 
+        //Evento executado quando o formulário é carregado
         private void Form1_Load(object sender, EventArgs e)
         {
             txtCodigo.Text = "Insira o código da peça...";
-            txtCodigo.ForeColor = Color.Gray;
+            txtCodigo.ForeColor = Color.Gray; //Simular placeholder
         }
 
 
-        //Eventos
+        //Evento acionado quando o utilizador clica ou entra na txtCodigo
         private void txtCodigo_Enter(object sender, EventArgs e)
         {
             if (txtCodigo.Text == "Insira o código da peça...")
@@ -33,6 +34,7 @@ namespace Cliente_Soap
             }
         }
 
+        //Evento acionado quando o utilizador sai da txtCodigo
         private void txtCodigo_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigo.Text))
