@@ -65,7 +65,7 @@ Console.WriteLine(" Pressiona Enter para sair.");
 Console.ReadLine();
 
 
-// 👉 Método que envia os dados para a API REST em vez de SQL
+// Método que envia os dados para a API REST em vez de SQL
 static async Task EnviarParaApiAsync(string codigoPeca, DateTime data, TimeSpan hora, int tempo, string resultado)
 {
     var produto = new

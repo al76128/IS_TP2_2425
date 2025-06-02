@@ -52,11 +52,11 @@ while (true)
 
     // Envia para topic exchange
     await channel.BasicPublishAsync(exchange: "producao_exchange", routingKey: routingKey, body: body);
-    Console.WriteLine($" Topic Exchange → '{routingKey}': {json}");
+    Console.WriteLine($" Topic Exchange > '{routingKey}': {json}");
 
     // Envia para stream
     await streamProducer.Send(new Message(body));
-    Console.WriteLine($" Stream → {json}");
+    Console.WriteLine($" Stream > {json}");
 
     await Task.Delay(5000);
 }
